@@ -941,7 +941,7 @@ function checkAuthenticated (req, resp, next) {
         return next();
     }
 
-    resp.render('login_Alert', { layout: 'index' });
+    resp.render('login_alert', { layout: 'index' });
 }
 
 // update the number of likes and dislikes in REVIEWS
