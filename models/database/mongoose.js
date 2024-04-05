@@ -8,6 +8,8 @@ mongoose.connect('mongodb://localhost:27017/Laundry_Shop')
     console.error('Something went wrong', error);
 });
 
+const mongo_uri = 'mongodb://localhost:27017/Laundry_Shop';
+
   // user account schema 
 const User_accSchema = new mongoose.Schema({
     username : {
@@ -178,5 +180,6 @@ module.exports = {
   ReviewsModel,
   ReplyModel,
   ShopOwnerModel,
-  LaundryShopModel
+  LaundryShopModel,
+  mongo_uri
 };

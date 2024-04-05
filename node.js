@@ -18,7 +18,7 @@
 //organize their views.
 //https://www.npmjs.com/package/express-handlebars
 
-const { User_accModel, ProfileModel, ReplyModel, ReviewsModel, ShopOwnerModel, LaundryShopModel } = require('./models/database/mongoose');
+const { User_accModel, ProfileModel, ReplyModel, ReviewsModel, ShopOwnerModel, LaundryShopModel, mongo_uri } = require('./models/database/mongoose');
 
 const fs = require('fs/promises');
 async function importData() {
@@ -85,13 +85,16 @@ async function importData() {
 }
 importData();
 
+
+
 const express = require('express');
 const session = require('express-session');
+const mongoStore = require('connect-mongodb-session')(session);
 const fileUpload = require('express-fileupload');
-const bcrypt = require('bcrypt'); // NEW ADDITION
-const passport = require('passport'); // NEW ADDITION
-const LocalStrategy = require('passport-local').Strategy; // NEW ADDITION
-const flash = require('express-flash'); // NEW ADDITION
+const bcrypt = require('bcrypt'); 
+const passport = require('passport'); 
+const LocalStrategy = require('passport-local').Strategy; 
+const flash = require('express-flash'); 
 
 const server = express();
 server.use(fileUpload()) // for fileuploads
@@ -108,8 +111,13 @@ server.use(express.urlencoded({ extended: true }));
 server.use(session({
     secret: 'penpen',
     resave: false,
-    saveUninitialized: false
-    //store
+    saveUninitialized: false,
+    store: new mongoStore({ 
+        uri: mongo_uri,
+        collection: 'mySession',
+        expires: 1000*60*60 // 1 hour
+    }),
+    // cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
 server.use(passport.initialize());
 server.use(passport.session());
@@ -345,10 +353,9 @@ server.get('/sign_up', function(req, resp){
 });
 
 // NEW VERSION
-server.get('/logout', function(req, res, next) {
-    req.logout(function(err) {
-        if (err) { return next(err); }
-            res.redirect('/homepage?=logged_out');
+server.get('/logout', function(req, resp){
+    req.session.destroy(function(err) {
+        resp.redirect('/homepage?=logged_out');
     });
 });
 
@@ -894,6 +901,7 @@ passport.use(new LocalStrategy(
 
             if (isMatch) {
                 // If username and password are correct, return the user
+
                 return done(null, user);
             }
             // If password doesn't match, return false
@@ -933,7 +941,7 @@ function checkAuthenticated (req, resp, next) {
         return next();
     }
 
-    resp.render('login_alert', { layout: 'index' });
+    resp.render('login_Alert', { layout: 'index' });
 }
 
 // update the number of likes and dislikes in REVIEWS
