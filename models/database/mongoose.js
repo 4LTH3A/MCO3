@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const run = async () => {
-  await mongoose.connect("mongodb://localhost:27017/Laundry_Shop");
+  await mongoose.connect("mongodb://127.0.0.1:27017/Laundry_Shop");
   console.log("Connected to myDB");
 }
 
@@ -16,7 +16,7 @@ run()
 //     console.error('Something went wrong', error);
 // });
 
-const mongo_uri = 'mongodb://localhost:27017/Laundry_Shop';
+const mongo_uri = 'mongodb://127.0.0.1:27017/Laundry_Shop';
 
   // user account schema 
 const User_accSchema = new mongoose.Schema({
