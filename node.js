@@ -40,12 +40,12 @@ async function importData() {
         const laundryShops = JSON.parse(laundryShopData);
 
         // Check if data already exists in collections
-        const existingUsers = await User_accModel.countDocuments();
-        const existingProfiles = await ProfileModel.countDocuments();
-        const existingReviews = await ReviewsModel.countDocuments();
-        const existingReplies = await ReplyModel.countDocuments();
-        const existingShopOwners = await ShopOwnerModel.countDocuments();
-        const existingLaundryShops = await LaundryShopModel.countDocuments();
+        const existingUsers = await User_accModel.countDocuments().maxTimeMS(30000);;
+        const existingProfiles = await ProfileModel.countDocuments().maxTimeMS(30000);;
+        const existingReviews = await ReviewsModel.countDocuments().maxTimeMS(30000);;
+        const existingReplies = await ReplyModel.countDocuments().maxTimeMS(30000);;
+        const existingShopOwners = await ShopOwnerModel.countDocuments().maxTimeMS(30000);;
+        const existingLaundryShops = await LaundryShopModel.countDocuments().maxTimeMS(30000);;
 
         // Insert data into MongoDB collections if they don't exist
         if (existingUsers === 0) {
