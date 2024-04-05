@@ -569,7 +569,7 @@ server.post('/submit_review', async function(req, resp) {
                         likes: 0,
                         dislikes: 0,
                         rating: parseInt(rate),
-                        replies: null
+                        replies: []
                     });
                     // Log success message
                     console.log('Review added successfully');
@@ -589,7 +589,7 @@ server.post('/submit_review', async function(req, resp) {
                 likes: 0,
                 dislikes: 0,
                 rating: parseInt(rate),
-                replies: null
+                replies: []
             });
             // Log success message
             console.log('Review added successfully without an image');
