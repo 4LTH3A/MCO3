@@ -95,6 +95,8 @@ const bcrypt = require('bcrypt');
 const passport = require('passport'); 
 const LocalStrategy = require('passport-local').Strategy; 
 const flash = require('express-flash'); 
+const cookieParser = require('cookie-parser');
+
 
 const server = express();
 server.use(fileUpload()) // for fileuploads
@@ -934,6 +936,29 @@ server.post('/log_in', passport.authenticate('local', {
     failureRedirect: '/log_in?error=not_matched',
     failureFlash: true
 }));
+
+server.post('/login', (req, res) => {
+    const { username, password, rememberMe } = req.body;
+
+    passport.authenticate('local', (err, user, info) => {
+        if(err) {
+            return res.status(500).send('Internal Service Error');
+        }
+        if(!user) {
+            return res.redirect('login_alert');
+        }
+
+        req.login(user, (err) => {
+            if(err) {
+                return res.status(500).send('Internal Service Error');
+            }
+            if (rememberMe) {
+                res.cookie('rememberMe', username, { maxAge: 30 * 24 * 60 * 60 * 1000 });
+            }
+            return res.redirect('/homepage');
+        });
+    })(req, res);
+});
 
 // FUNCTION
 function checkAuthenticated (req, resp, next) {
