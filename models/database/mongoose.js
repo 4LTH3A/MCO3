@@ -1,12 +1,20 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/Laundry_Shop')
-  .then(() => {
-    console.log('Connection successful');
-  })
-  .catch((error) => {
-    console.error('Something went wrong', error);
-});
+const run = async () => {
+  await mongoose.connect("mongodb://127.0.0.1:27017/myDB");
+  console.log("Connected to myDB");
+}
+
+run()
+.catch((err) => console.error(err))
+
+// mongoose.connect('mongodb://localhost:27017/Laundry_Shop')
+//   .then(() => {
+//     console.log('Connection successful');
+//   })
+//   .catch((error) => {
+//     console.error('Something went wrong', error);
+// });
 
 const mongo_uri = 'mongodb://localhost:27017/Laundry_Shop';
 
