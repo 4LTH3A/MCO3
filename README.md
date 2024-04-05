@@ -1,4 +1,9 @@
 # MCO3
+@keira Alcantara\
+@Reina Althea Garcia\
+@Miko Santos\
+@Alliyah Zulueta
+
 NOTE: Here are the npm commands we used to install the external libraries.
 
 Install Command:\
