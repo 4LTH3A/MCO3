@@ -34,7 +34,7 @@
                 </div>
                 
                 <div class="input-field">
-                    <textarea placeholder="Short Description" style="resize: none;" name="shortdesc" required></textarea>
+                    <textarea placeholder="Short Description" style="resize: none;" name="shortdesc"></textarea>
                 </div>
                 <br>
             
@@ -86,7 +86,7 @@
             return false;
         }
 
-        if (!firstname || !lastname || !username || !email || !mobnum || !shortdesc || !password || !confirmPassword || !file) {
+        if (!firstname || !lastname || !username || !email || !mobnum || !password || !confirmPassword || !file) {
             alert('All fields are required');
             return false;
         }
