@@ -120,6 +120,10 @@ const ReviewsSchema = new mongoose.Schema({
   likes: Number,
   dislikes: Number,
   rating: Number,
+  edited : {
+    type : Boolean,
+    default : false 
+  },
 
   replies: [{
     _id: String,

@@ -256,7 +256,6 @@ const editReview = async (element, reviewId) => {
     const commentElement = reviewContainer.querySelector('.comment');
     const titleElement = reviewContainer.querySelector('.user-review-title-1');
     const ratingElement = reviewContainer.querySelector('.stars');
-    const textEdited = reviewContainer.querySelector('.edited');
 
     const stars = ratingElement.querySelectorAll('.starsImg');
     const rating = stars.length;
@@ -311,7 +310,8 @@ const editReview = async (element, reviewId) => {
                     body: JSON.stringify({
                         title: updatedTitle,
                         content: updatedComment,
-                        rating: updatedRating
+                        rating: updatedRating,
+                        edited : true
                     })
                 });
 
@@ -323,7 +323,6 @@ const editReview = async (element, reviewId) => {
                 commentElement.textContent = updatedComment;
                 titleElement.textContent = updatedTitle;
                 ratingElement.innerHTML  = generateStarRating(updatedRating); // Update rating
-                textEdited.style.display = 'block';
 
             } catch (error) {
                 console.error('Error updating review:', error);
@@ -335,7 +334,6 @@ const editReview = async (element, reviewId) => {
             commentElement.innerHTML = currentComment;
             titleElement.innerHTML = currentTitle;
             ratingElement.innerHTML  = generateStarRating(rating);
-            textEdited.style.display = 'none';
         }
 
         // Remove the save and cancel buttons

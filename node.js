@@ -1315,13 +1315,13 @@ server.post('/undislike_reply/:reviewId/:replyId', async (req, res) => {
 // update the edit review 
 server.post('/edit_review/:id', async (req, res) => {
     const reviewId = req.params.id;
-    const { title, content, rating } = req.body;
+    const { title, content, rating, edited } = req.body;
 
     try {
         // Find by  ID and update 
         const updatedReview = await ReviewsModel.findByIdAndUpdate(
             reviewId,
-            { title: title, content: content, rating: rating },
+            { title: title, content: content, rating: rating, edited : edited },
             { new: true } // updaate document
         );
 
