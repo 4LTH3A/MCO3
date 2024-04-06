@@ -1,22 +1,15 @@
 const mongoose = require('mongoose');
 
-const run = async () => {
-  await mongoose.connect("mongodb+srv://penpen:Qwerty09@cluster0.jzy9jwp.mongodb.net/Laundry_Shop?retryWrites=true&w=majority&appName=Cluster0");
-  console.log("Connected to myDB");
-}
+mongoose.connect('mongodb://localhost:27017/Laundry_Shop')
+  .then(() => {
+    console.log('Connection successful');
+  })
+  .catch((error) => {
+    console.error('Something went wrong', error);
+});
 
-run()
-.catch((err) => console.error(err))
-
-// mongoose.connect('mongodb://localhost:27017/Laundry_Shop')
-//   .then(() => {
-//     console.log('Connection successful');
-//   })
-//   .catch((error) => {
-//     console.error('Something went wrong', error);
-// });
-
-const mongo_uri = 'mongodb+srv://penpen:Qwerty09@cluster0.jzy9jwp.mongodb.net/Laundry_Shop?retryWrites=true&w=majority&appName=Cluster0';
+// Export Mongoose connection object
+const mongo_uri = 'mongodb://localhost:27017/Laundry_Shop';
 
   // user account schema 
 const User_accSchema = new mongoose.Schema({
@@ -174,6 +167,18 @@ const ShopOwnerSchema = new mongoose.Schema({
   firstname : String,
   lastname : String,
   shortdesc : String,
+  likes: [{
+    reviewId: String,
+  }],
+  dislikes: [{
+    reviewId: String,
+  }],
+  likesReply: [{
+    replyId: String,
+  }],
+  dislikesReply: [{
+    replyId: String,
+  }],
 });
   
 
@@ -195,3 +200,5 @@ module.exports = {
   LaundryShopModel,
   mongo_uri
 };
+
+

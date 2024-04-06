@@ -86,7 +86,6 @@ async function importData() {
 importData();
 
 
-
 const express = require('express');
 const session = require('express-session');
 const mongoStore = require('connect-mongodb-session')(session);
@@ -113,7 +112,7 @@ server.use(express.urlencoded({ extended: true }));
 server.use(session({
     secret: 'penpen',
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     store: new mongoStore({ 
         uri: mongo_uri,
         collection: 'mySession',
@@ -146,12 +145,12 @@ const generateStars = function(rating) {
 
 // NEW VERSION
 const checkEqual = async function (req, value2) {
-    if (!req.user) {
+    if (req.session == undefined) {
         return false;
     }
 
     try {
-        const profileInfo = await ProfileModel.findOne({ username: req.user.username }).lean();
+        const profileInfo = await ProfileModel.findOne({ username: req.session.username }).lean();
 
         if (!profileInfo) {
             return false;
@@ -165,20 +164,27 @@ const checkEqual = async function (req, value2) {
 };
 
 const checkLikeReview = async function (req, reviewId) {
-    if (!req.user) {
+    if (req.session.loginID == undefined) {
         return false; // If the user is not logged in, return false
     }
 
     try {
-        const profileInfo = await ProfileModel.findOne({ username: req.user.username }).lean();
+        const profileInfo = await ProfileModel.findOne({ username: req.session.username }).lean();
+        const OwnerProfileInfo = await ShopOwnerModel.findOne({ username: req.session.username }).lean();
 
-        if (!profileInfo || !profileInfo.likes) {
-            return false; // If user's profile info or likes array is not found, return false
+        if ((!profileInfo || !profileInfo.likes) && (!OwnerProfileInfo || !OwnerProfileInfo.likes)) {
+            return false; 
         }
 
-        // Check if the provided reviewId exists in the user's liked reviews
-        const likedReview = profileInfo.likes.find(like => like.reviewId === reviewId);
-        return likedReview !== undefined;
+        let likedReview;
+        let OwnerLikedReview;
+        if(profileInfo) {
+            likedReview = profileInfo.likes.find(like => like.reviewId === reviewId);
+        } else {
+            OwnerLikedReview = OwnerProfileInfo.likes.find(like => like.reviewId === reviewId);
+        }
+
+        return likedReview !== undefined || OwnerLikedReview !== undefined;
     } catch (error) {
         console.error("An error occurred:", error);
         return false; // Return false in case of any error
@@ -186,20 +192,27 @@ const checkLikeReview = async function (req, reviewId) {
 };
 
 const checkDislikeReview = async function (req, reviewId) {
-    if (!req.user) {
+    if (req.session.loginID == undefined) {
         return false; // If the user is not logged in, return false
     }
 
     try {
-        const profileInfo = await ProfileModel.findOne({ username: req.user.username }).lean();
+        const profileInfo = await ProfileModel.findOne({ username: req.session.username }).lean();
+        const OwnerProfileInfo = await ShopOwnerModel.findOne({ username: req.session.username }).lean();
 
-        if (!profileInfo || !profileInfo.likes) {
-            return false; // If user's profile info or likes array is not found, return false
+        if ((!profileInfo || !profileInfo.dislikes) && (!OwnerProfileInfo || !OwnerProfileInfo.dislikes)) {
+            return false; 
         }
 
-        // Check if the provided reviewId exists in the user's liked reviews
-        const dislikedReview = profileInfo.dislikes.find(dislike => dislike.reviewId === reviewId);
-        return dislikedReview !== undefined;
+        let dislikedReview;
+        let OwnerDislikedReview;
+        if(profileInfo) {
+            dislikedReview = profileInfo.dislikes.find(dislike => dislike.reviewId === reviewId);
+        } else {
+            OwnerDislikedReview = OwnerProfileInfo.dislikes.find(dislike => dislike.reviewId === reviewId);
+        }
+
+        return dislikedReview !== undefined || OwnerDislikedReview != undefined;
     } catch (error) {
         console.error("An error occurred:", error);
         return false; // Return false in case of any error
@@ -207,20 +220,28 @@ const checkDislikeReview = async function (req, reviewId) {
 };
 
 const checkLikeReply = async function (req, replyId) {
-    if (!req.user) {
+    if (req.session.loginID == undefined) {
         return false; // If the user is not logged in, return false
     }
 
     try {
-        const profileInfo = await ProfileModel.findOne({ username: req.user.username }).lean();
+        const profileInfo = await ProfileModel.findOne({ username: req.session.username }).lean();
+        const OwnerProfileInfo = await ShopOwnerModel.findOne({ username: req.session.username }).lean();
 
-        if (!profileInfo || !profileInfo.likes) {
-            return false; // If user's profile info or likes array is not found, return false
+        if ((!profileInfo || !profileInfo.likesReply) && (!OwnerProfileInfo || !OwnerProfileInfo.likesReply)) {
+            return false;
         }
 
-        // Check if the provided reviewId exists in the user's liked reviews
-        const likedReply = profileInfo.likesReply.find(like => like.replyId === replyId);
-        return likedReply !== undefined;
+        
+        let likedReply;
+        let OwnerLikedReply;
+        if(profileInfo) {
+            likedReply = profileInfo.likesReply.find(like => like.replyId === replyId);
+        } else {
+            OwnerLikedReply = OwnerProfileInfo.likesReply.find(like => like.replyId === replyId);
+        }
+
+        return likedReply !== undefined || OwnerLikedReply !== undefined;
     } catch (error) {
         console.error("An error occurred:", error);
         return false; // Return false in case of any error
@@ -228,20 +249,27 @@ const checkLikeReply = async function (req, replyId) {
 };
 
 const checkDislikeReply = async function (req, replyId) {
-    if (!req.user) {
+    if (req.session.loginID == undefined) {
         return false; // If the user is not logged in, return false
     }
 
     try {
-        const profileInfo = await ProfileModel.findOne({ username: req.user.username }).lean();
+        const profileInfo = await ProfileModel.findOne({ username: req.session.username }).lean();
+        const OwnerProfileInfo = await ShopOwnerModel.findOne({ username: req.session.username }).lean();
 
-        if (!profileInfo || !profileInfo.likes) {
-            return false; // If user's profile info or likes array is not found, return false
+        if ((!profileInfo || !profileInfo.dislikesReply) && (!OwnerProfileInfo || !OwnerProfileInfo.dislikesReply)) {
+            return false; 
         }
 
-        // Check if the provided reviewId exists in the user's liked reviews
-        const dislikedReply = profileInfo.dislikesReply.find(dislike => dislike.replyId === replyId);
-        return dislikedReply !== undefined;
+        let dislikedReply;
+        let OwnerDislikedReply;
+
+        if(profileInfo) {
+            dislikedReply = profileInfo.dislikesReply.find(dislike => dislike.replyId === replyId);
+        } else {
+            OwnerDislikedReply = OwnerProfileInfo.dislikesReply.find(dislike => dislike.replyId === replyId);
+        }
+        return dislikedReply !== undefined || OwnerDislikedReply !== undefined;
     } catch (error) {
         console.error("An error occurred:", error);
         return false; // Return false in case of any error
@@ -271,10 +299,10 @@ server.use(express.static('public'));
 //frame to the webpage.
 server.get('/', function(req, resp){
     let currentUser;
-    if(req.user) {
-        currentUser = '@' + req.user.username;
-    } else {
+    if(req.session.loginID == undefined) {
         currentUser = "No user logged in.";
+    } else {
+        currentUser = '@' + req.session.username;
     }
     resp.render('homepage',{
         layout: 'index',
@@ -289,10 +317,10 @@ server.get('/', function(req, resp){
 server.get('/homepage', function(req, resp){
     
     let currentUser;
-    if(req.user) {
-        currentUser = '@' + req.user.username;
-    } else {
+    if(req.session.loginID == undefined) {
         currentUser = "No user logged in.";
+    } else {
+        currentUser = '@' + req.session.username;
     }
 
     resp.render('homepage',{
@@ -326,10 +354,10 @@ server.get('/search', function(req, resp){
 // NEW VERSION
 server.get('/profile', checkAuthenticated, async function(req, resp){
     try {
-        const profileInfo = await ProfileModel.find({username : req.user.username}).lean();
-        const OwnerProfileInfo = await ShopOwnerModel.find({username : req.user.username}).lean();
-        const profileReviews = await ReviewsModel.find({username : req.user.username}).lean();
-        const profileReplies = await ReplyModel.find({username : req.user.username}).lean();
+        const profileInfo = await ProfileModel.find({username : req.session.username}).lean();
+        const OwnerProfileInfo = await ShopOwnerModel.find({username : req.session.username}).lean();
+        const profileReviews = await ReviewsModel.find({username : req.session.username}).lean();
+        const profileReplies = await ReplyModel.find({username : req.session.username}).lean();
         resp.render('profile',{
             layout: 'index',
             title: 'Profile Page',
@@ -396,8 +424,8 @@ server.get('/search_result', function(req, resp){
 server.get('/edit_profile', async function(req, resp){
     try {
         // const loggedin = await User_accModel.find({isLoggedin : true}).lean(); //debugging
-        const profileInfo = await ProfileModel.find({username : req.user.username}).lean(); 
-        const OwnerProfileInfo = await ShopOwnerModel.find({username : req.user.username}).lean();
+        const profileInfo = await ProfileModel.find({username : req.session.username}).lean(); 
+        const OwnerProfileInfo = await ShopOwnerModel.find({username : req.session.username}).lean();
 
         resp.render('edit_profile',{
             layout: 'index',
@@ -545,8 +573,8 @@ server.post('/submit_review', async function(req, resp) {
         
         // username (currently loggedIn)
         // const loggedin = await User_accModel.find({isLoggedin : true}).lean(); //debugging
-        const profileInfo = await ProfileModel.findOne({username : req.user.username}).lean();
-        const OwnerProfileInfo = await ProfileModel.findOne({username : req.user.username}).lean();
+        const profileInfo = await ProfileModel.findOne({username : req.session.username}).lean();
+        const OwnerProfileInfo = await ProfileModel.findOne({username : req.session.username}).lean();
     
         // Extract data from the request body
         const { shop_name, rtitle, rcomment, rate } = req.body;
@@ -562,8 +590,8 @@ server.post('/submit_review', async function(req, resp) {
                     ReviewsModel.create({
                         _id: newReviewId,
                         shop: shop_name,
-                        username: req.user.username,
-                        profile_pic: profileInfo != null ? profileInfo.profile_pic: OwnerProfileInfo.profile_pic,
+                        username: req.session.username,
+                        profile_pic: profileInfo != null ? profileInfo.profile_pic : OwnerProfileInfo.profile_pic,
                         title: rtitle,
                         content: rcomment,
                         commentImg: '/image/' + commentImg.name,
@@ -582,8 +610,8 @@ server.post('/submit_review', async function(req, resp) {
             ReviewsModel.create({
                 _id: newReviewId,
                 shop: shop_name,
-                username: req.user.username,
-                profile_pic: profileInfo != null ? profileInfo.profile_pic: OwnerProfileInfo.profile_pic,
+                username: req.session.username,
+                profile_pic: profileInfo != null ? profileInfo.profile_pic : OwnerProfileInfo.profile_pic,
                 title: rtitle,
                 content: rcomment,
                 commentImg: null,
@@ -828,7 +856,7 @@ server.post('/checkEqual', async (req, resp) => {
 server.post('/checkLogin', async (req, resp) => {
     let result = false;
     try {
-        if(req.user) {
+        if(req.session.loginID != undefined) {
             result = true
         }
         resp.send(result);
@@ -897,13 +925,9 @@ passport.use(new LocalStrategy(
             }
             // Check if password matches
             const isMatch = await bcrypt.compare(password, user.password);
-            
-            console.log(password);
-            console.log(user.password);
 
             if (isMatch) {
                 // If username and password are correct, return the user
-
                 return done(null, user);
             }
             // If password doesn't match, return false
@@ -930,14 +954,8 @@ passport.deserializeUser(async function(id, done) {
     }
 });
 
-// Log in route using Passport.js authentication
-server.post('/log_in', passport.authenticate('local', {
-    successRedirect: '/homepage?log_in=successful',
-    failureRedirect: '/log_in?error=not_matched',
-    failureFlash: true
-}));
 
-server.post('/login', (req, res) => {
+server.post('/log_in', (req, res, next) => {
     const { username, password, rememberMe } = req.body;
 
     passport.authenticate('local', (err, user, info) => {
@@ -945,7 +963,7 @@ server.post('/login', (req, res) => {
             return res.status(500).send('Internal Service Error');
         }
         if(!user) {
-            return res.redirect('login_alert');
+            return res.redirect('/log_in?error=not_matched');
         }
 
         req.login(user, (err) => {
@@ -955,9 +973,13 @@ server.post('/login', (req, res) => {
             if (rememberMe) {
                 res.cookie('rememberMe', username, { maxAge: 30 * 24 * 60 * 60 * 1000 });
             }
-            return res.redirect('/homepage');
+            req.session.username = username;
+            req.session.loginID = req.sessionID;
+            console.log(req.session.username);
+            console.log(req.session.loginID);
+            return res.redirect('/homepage?log_in=successful');
         });
-    })(req, res);
+    })(req, res, next);
 });
 
 // FUNCTION
@@ -986,14 +1008,16 @@ server.post('/like_review/:id', async (req, res) => {
 
         // Update the user's profile to add the liked review to the likes array
         const updatedProfile = await ProfileModel.findOneAndUpdate(
-            { username: req.user.username },
+            { username: req.session.username },
             { $push: { likes: { reviewId: reviewId } } }, // Assuming likes is an array of objects with reviewId field
             { new: true }
         );
 
-        if (!updatedProfile) {
-            return res.status(404).json({ error: 'User profile not found' });
-        }
+        const updatedOwnerProfile = await ShopOwnerModel.findOneAndUpdate(
+            { username: req.session.username },
+            { $push: { likes: { reviewId: reviewId } } }, // Assuming likes is an array of objects with reviewId field
+            { new: true }
+        );
 
         console.log('Review liked');
         res.json({ message: 'Review liked successfully', review: updatedReview });
@@ -1018,14 +1042,16 @@ server.post('/unlike_review/:id', async (req, res) => {
         }
 
         const updatedProfile = await ProfileModel.findOneAndUpdate(
-            { username: req.user.username },
+            { username: req.session.username },
             { $pull: { likes: { reviewId: reviewId } } }, // Remove the reviewId from likes array
             { new: true }
         );
 
-        if (!updatedProfile) {
-            return res.status(404).json({ error: 'User profile not found' });
-        }
+        const updatedOwnerProfile = await ShopOwnerModel.findOneAndUpdate(
+            { username: req.session.username },
+            { $pull: { likes: { reviewId: reviewId } } }, // Assuming likes is an array of objects with reviewId field
+            { new: true }
+        );
 
         console.log('Review liked');
         res.json({ message: 'Review liked successfully', review: updatedReview });
@@ -1050,14 +1076,16 @@ server.post('/dislike_review/:id', async (req, res) => {
         }
 
         const updatedProfile = await ProfileModel.findOneAndUpdate(
-            { username: req.user.username },
+            { username: req.session.username },
             { $push: { dislikes: { reviewId: reviewId } } }, // Remove the reviewId from likes array
             { new: true }
         );
 
-        if (!updatedProfile) {
-            return res.status(404).json({ error: 'User profile not found' });
-        }
+        const updatedOwnerProfile = await ShopOwnerModel.findOneAndUpdate(
+            { username: req.session.username },
+            { $push: { dislikes: { reviewId: reviewId } } }, // Assuming likes is an array of objects with reviewId field
+            { new: true }
+        );
 
         console.log('disliked review');
         res.json({ message: 'Review disliked successfully', review: updatedReview });
@@ -1082,14 +1110,16 @@ server.post('/undislike_review/:id', async (req, res) => {
         }
 
         const updatedProfile = await ProfileModel.findOneAndUpdate(
-            { username: req.user.username },
+            { username: req.session.username },
             { $pull: { dislikes: { reviewId: reviewId } } }, // Remove the reviewId from likes array
             { new: true }
         );
 
-        if (!updatedProfile) {
-            return res.status(404).json({ error: 'User profile not found' });
-        }
+        const updatedOwnerProfile = await ShopOwnerModel.findOneAndUpdate(
+            { username: req.session.username },
+            { $pull: { dislikes: { reviewId: reviewId } } }, // Assuming likes is an array of objects with reviewId field
+            { new: true }
+        );
 
         console.log('disliked review');
         res.json({ message: 'Review disliked successfully', review: updatedReview });
@@ -1131,14 +1161,16 @@ server.post('/like_reply/:reviewId/:replyId', async (req, res) => {
         }
 
         const updatedProfile = await ProfileModel.findOneAndUpdate(
-            { username: req.user.username },
+            { username: req.session.username },
             { $push: { likesReply: { replyId: replyId } } }, // Assuming likes is an array of objects with reviewId field
             { new: true }
         );
 
-        if (!updatedProfile) {
-            return res.status(404).json({ error: 'User profile not found' });
-        }
+        const updatedOwnerProfile = await ShopOwnerModel.findOneAndUpdate(
+            { username: req.session.username },
+            { $push: { likesReply: { replyId: replyId } } }, // Assuming likes is an array of objects with reviewId field
+            { new: true }
+        );
 
         // Increment the likes of the reply
         console.log(reply.likes);
@@ -1180,14 +1212,16 @@ server.post('/unlike_reply/:reviewId/:replyId', async (req, res) => {
         }
 
         const updatedProfile = await ProfileModel.findOneAndUpdate(
-            { username: req.user.username },
+            { username: req.session.username },
             { $pull: { likesReply: { replyId: replyId } } }, // Remove the reviewId from likes array
             { new: true }
         );
 
-        if (!updatedProfile) {
-            return res.status(404).json({ error: 'User profile not found' });
-        }
+        const updatedOwnerProfile = await ShopOwnerModel.findOneAndUpdate(
+            { username: req.session.username },
+            { $pull: { likesReply: { replyId: replyId } } }, // Assuming likes is an array of objects with reviewId field
+            { new: true }
+        );
 
         // Increment the likes of the reply
         console.log(reply.likes);
@@ -1229,14 +1263,16 @@ server.post('/dislike_reply/:reviewId/:replyId', async (req, res) => {
         }
 
         const updatedProfile = await ProfileModel.findOneAndUpdate(
-            { username: req.user.username },
+            { username: req.session.username },
             { $push: { dislikesReply: { replyId: replyId } } }, // Remove the reviewId from likes array
             { new: true }
         );
 
-        if (!updatedProfile) {
-            return res.status(404).json({ error: 'User profile not found' });
-        }
+        const updatedOwnerProfile = await ShopOwnerModel.findOneAndUpdate(
+            { username: req.session.username },
+            { $push: { dislikesReply: { replyId: replyId } } }, // Assuming likes is an array of objects with reviewId field
+            { new: true }
+        );
 
 
         // Increment the likes of the reply
@@ -1280,14 +1316,16 @@ server.post('/undislike_reply/:reviewId/:replyId', async (req, res) => {
         }
 
         const updatedProfile = await ProfileModel.findOneAndUpdate(
-            { username: req.user.username },
+            { username: req.session.username },
             { $pull: { dislikesReply: { replyId: replyId } } }, // Remove the reviewId from likes array
             { new: true }
         );
 
-        if (!updatedProfile) {
-            return res.status(404).json({ error: 'User profile not found' });
-        }
+        const updatedOwnerProfile = await ShopOwnerModel.findOneAndUpdate(
+            { username: req.session.username },
+            { $pull: { dislikesReply: { replyId: replyId } } }, // Assuming likes is an array of objects with reviewId field
+            { new: true }
+        );
 
         // Increment the likes of the reply
         reply.dislikes--;
@@ -1303,13 +1341,6 @@ server.post('/undislike_reply/:reviewId/:replyId', async (req, res) => {
     }
 });
 // --------------------------------------------------
-
-
-
-
-
-
-
 
 
 // update the edit review 
@@ -1359,13 +1390,13 @@ server.post('/reviews/:reviewId/replies', async (req, res) => {
         const count = await ReplyModel.countDocuments();
         const newReplyId = `review_${count + 1}`;
 
-        const profileInfo = await ProfileModel.findOne({username : req.user.username}).lean();
-        const OwnerProfileInfo = await ProfileModel.findOne({username : req.user.username}).lean();
+        const profileInfo = await ProfileModel.findOne({username : req.session.username}).lean();
+        const OwnerProfileInfo = await ProfileModel.findOne({username : req.session.username}).lean();
 
         // Add the new reply to the  array
         const newReply = {
             _id : newReplyId,
-            username : req.user.username,
+            username : req.session.username,
             profile_pic : profileInfo != null ? profileInfo.profile_pic: OwnerProfileInfo.profile_pic,
             review : reviewId,
             title : title,
@@ -1380,7 +1411,7 @@ server.post('/reviews/:reviewId/replies', async (req, res) => {
 
         ReplyModel.create({
             _id : newReplyId,
-            username : req.user.username,
+            username : req.session.username,
             profile_pic : profileInfo != null ? profileInfo.profile_pic: OwnerProfileInfo.profile_pic,
             review : reviewId,
             title : title,
