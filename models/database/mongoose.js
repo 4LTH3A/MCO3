@@ -1,15 +1,22 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/Laundry_Shop')
-  .then(() => {
-    console.log('Connection successful');
-  })
-  .catch((error) => {
-    console.error('Something went wrong', error);
-});
+const run = async () => {
+  await mongoose.connect("mongodb+srv://penpen:Qwerty09@cluster0.jzy9jwp.mongodb.net/Laundry_Shop?retryWrites=true&w=majority&appName=Cluster0");
+  console.log("Connected to myDB");
+}
 
-// Export Mongoose connection object
-const mongo_uri = 'mongodb://localhost:27017/Laundry_Shop';
+run()
+.catch((err) => console.error(err))
+
+// mongoose.connect('mongodb://localhost:27017/Laundry_Shop')
+//   .then(() => {
+//     console.log('Connection successful');
+//   })
+//   .catch((error) => {
+//     console.error('Something went wrong', error);
+// });
+
+const mongo_uri = 'mongodb+srv://penpen:Qwerty09@cluster0.jzy9jwp.mongodb.net/Laundry_Shop?retryWrites=true&w=majority&appName=Cluster0';
 
   // user account schema 
 const User_accSchema = new mongoose.Schema({
@@ -200,5 +207,3 @@ module.exports = {
   LaundryShopModel,
   mongo_uri
 };
-
-
