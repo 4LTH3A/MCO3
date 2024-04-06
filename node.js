@@ -982,6 +982,8 @@ server.post('/log_in', (req, res, next) => {
     })(req, res, next);
 });
 
+server.use(cookieParser());
+
 // FUNCTION
 function checkAuthenticated (req, resp, next) {
     if(req.isAuthenticated()) {
