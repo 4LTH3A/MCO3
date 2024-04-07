@@ -364,6 +364,7 @@ h3{
     height: 30px;
     width: 30px;
     transition: transform 0.3s ease;
+    cursor: pointer;
 
     margin-top: 12px;
 }
