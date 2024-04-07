@@ -1,7 +1,26 @@
 <div class="parent-container">
    {{> navbar}}
 
-    
+    <div class="search-text-area-border" style="display : none">
+            <form class="search-form-container" action="/search_result" onsubmit="updateSearchResultPlaceholder()">
+                <div class="search-menu">
+                    <input id="search-result-txt" name="search-result-txt" class="textfield" placeholder="Searched" />
+                </div>
+                <div class="filter-menu">
+                    <select id="filter" name="filter" class="filter_rating">
+                        <option value="filterlbl">FILTER</option>
+                        <option value="5">5 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="2">2 Stars</option>
+                        <option value="1">1 Star</option>
+                    </select>
+                </div>
+                <div class="search-icon-container">
+                    <img src="image/search_logo.png" class="search_icon" />
+                </div>
+            </form>
+        </div>
     <div class="search-container">
 
         <div class="flex-all">
