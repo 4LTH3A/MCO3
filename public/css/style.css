@@ -766,6 +766,7 @@ section .content .content-1 {
 
     margin-left: 20px;
     margin-top: 10px;
+    cursor: pointer;
 }
 
 .edit, .delete {
