@@ -288,6 +288,7 @@ h3{
 
     margin-right: 20px;
     margin-left: auto;
+    cursor: pointer;
 }
 .store-container-card1:hover, .store-container-card2:hover, .store-container-card3:hover , .store-container-card4:hover{
     box-shadow: 0 0 10px gray;
